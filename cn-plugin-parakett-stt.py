@@ -7,6 +7,7 @@ from typing import override, Any
 import os
 import numpy as np
 import speech_recognition as sr
+import sherpa_onnx
 
 from lib.PluginHelper import PluginHelper, STTModel
 from lib.PluginSettingDefinitions import (
@@ -20,18 +21,13 @@ class SherpaParakeetSTTModel(STTModel):
     """Sherpa ONNX Parakeet Speech-to-Text model implementation."""
     
     def __init__(self, model_dir: str):
-        super().__init__("sherpa-parakeet-stt")
+        super().__init__("parakeet-stt")
         self.model_dir = model_dir
         self._recognizer = None
     
     def _get_recognizer(self) -> Any:
         """Lazily initialize the Sherpa recognizer."""
         if self._recognizer is None:
-            try:
-                import sherpa_onnx
-            except ImportError:
-                raise ImportError("sherpa-onnx is not installed. Install it with: pip install sherpa-onnx")
-            
             if not os.path.exists(self.model_dir):
                 raise ValueError(f"Model directory not found: {self.model_dir}")
 
@@ -107,7 +103,7 @@ class SherpaParakeetPlugin(PluginBase):
     def create_model(self, provider_id: str, settings: dict[str, Any]) -> STTModel:
         """Create a model instance for the given provider."""
         
-        if provider_id == 'sherpa-parakeet-stt':
+        if provider_id == 'parakeet-stt':
             # Model is expected to be in a 'model' subdirectory relative to this file
             plugin_dir = os.path.dirname(os.path.abspath(__file__))
             model_dir = os.path.join(plugin_dir, "model")
@@ -115,3 +111,15 @@ class SherpaParakeetPlugin(PluginBase):
             return SherpaParakeetSTTModel(model_dir=model_dir)
         
         raise ValueError(f'Unknown Sherpa provider: {provider_id}')
+
+if __name__ == "__main__":
+    # For testing purposes
+    plugin_manifest = PluginManifest(
+        name="Sherpa Parakeet STT Plugin",
+        version="1.0.0",
+        author="OpenAI",
+        description="Sherpa ONNX Parakeet STT Plugin for COVAS:NEXT"
+    )
+    plugin = SherpaParakeetPlugin(plugin_manifest)
+    model = plugin.create_model('parakeet-stt', {})
+    log('info', "Parakeet STT Plugin initialized successfully.")

@@ -1,3 +1,4 @@
 sherpa-onnx
 numpy
 soundfile
+SpeechRecognition
