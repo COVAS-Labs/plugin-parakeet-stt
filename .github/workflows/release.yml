@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download and extract model
+        run: |
+          wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8.tar.bz2
+          tar -xvf sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8.tar.bz2
+          mv sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8 model
+          rm sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8.tar.bz2
+
+      - name: Build plugin package
+        run: |
+          chmod +x pack.sh
+          ./pack.sh
+
+      - name: Rename artifact
+        run: mv dist/cn-plugin-parakett-stt.zip dist/cn-plugin-parakett-stt-linux.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: dist/*.zip
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download and extract model
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8.tar.bz2" -OutFile "model.tar.bz2"
+          tar -xvf model.tar.bz2
+          Rename-Item -Path "sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8" -NewName "model"
+          Remove-Item "model.tar.bz2"
+        shell: pwsh
+
+      - name: Build plugin package
+        run: ./pack.ps1
+        shell: pwsh
+
+      - name: Rename artifact
+        run: Rename-Item -Path "dist\cn-plugin-parakett-sttPlugin.zip" -NewName "cn-plugin-parakett-stt-windows.zip"
+        shell: pwsh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: dist/*.zip
+
+  release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-build
+          path: dist
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

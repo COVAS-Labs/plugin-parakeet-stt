@@ -1,13 +1,19 @@
-# COVAS:NEXT COVAS:NEXT Plugin Parakeet STT
+# COVAS:NEXT Plugin Parakeet STT
 
-Run STT locally using Nvidia Parakeet
+Run STT locally using Nvidia Parakeet v3 models via Sherpa ONNX.
 
+## About
+
+This plugin provides offline Speech-to-Text (STT) capabilities for COVAS:NEXT using the **Nvidia Parakeet TDT** model, specifically the `sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8` quantized version. This allows for high-accuracy, low-latency transcription without requiring an internet connection or a GPU.
+
+### Language Support
+The included model is **multilingual** and supports **25 European languages**, including English, German, French, Spanish, Italian, Dutch, Polish, Russian, and more.
 
 ## Features
 
-- Feature 1
-- Feature 2
-
+- **Offline Transcription**: No internet connection required.
+- **High Accuracy**: Uses Nvidia's state-of-the-art Parakeet TDT architecture.
+- **Efficient**: Runs on CPU using the optimized Sherpa ONNX runtime with int8 quantization.
 
 ## Installation
 
@@ -52,3 +58,7 @@ The workflow will automatically build the plugin using the pack script and creat
 ## Acknowledgements
 
  - [COVAS:NEXT](https://github.com/RatherRude/Elite-Dangerous-AI-Integration)
+ - [Sherpa ONNX](https://github.com/k2-fsa/sherpa-onnx) - For the excellent ONNX runtime wrapper.
+ - [Nvidia NeMo](https://github.com/NVIDIA/NeMo) - For the Parakeet model architecture.
+ - [ONNX Runtime](https://onnxruntime.ai/) - For the underlying inference engine.
+

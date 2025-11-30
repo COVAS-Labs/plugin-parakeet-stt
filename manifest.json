@@ -1,0 +1,9 @@
+{
+    "guid": "b77dec4f-8993-4213-8d44-caf902dabc6d",
+    "name": "COVAS:NEXT Plugin Parakeet STT",
+    "version": "0.0.1",
+    "author": "lucaelin",
+    "repository": "https://github.com/COVAS-Labs/plugin-parakeet-stt",
+    "description": "Run STT locally using Nvidia Parakeet",
+    "entrypoint": "cn-plugin-parakett-stt.py"
+}
