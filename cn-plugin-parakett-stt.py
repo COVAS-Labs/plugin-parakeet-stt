@@ -11,6 +11,7 @@ import sherpa_onnx
 
 from lib.PluginHelper import PluginHelper, STTModel
 from lib.PluginSettingDefinitions import (
+    PluginSettings,
     ModelProviderDefinition,
     SettingsGrid,
 )
@@ -89,6 +90,31 @@ class SherpaParakeetPlugin(PluginBase):
     
     def __init__(self, plugin_manifest: PluginManifest):
         super().__init__(plugin_manifest)
+        
+        self.settings = {
+            PluginSettings(
+                key="Parakeet STT",
+                label="Parakeet STT",
+                icon="mic",
+                grids=[
+                    SettingsGrid(
+                        key="general",
+                        label="General",
+                        fields=[
+                            ParagraphSetting(
+                                key="info_text",
+                                label=None,
+                                type="paragraph",
+                                readonly=False,
+                                placeholder=None,
+                                
+                                content="To use Parakeet STT, select it as your *STT provider* in *Advanced → STT Settings*."
+                            ),
+                        ]
+                    ),
+                ]
+            )
+        }
         
         self.model_providers = [
             ModelProviderDefinition(
