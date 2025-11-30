@@ -14,6 +14,7 @@ from lib.PluginSettingDefinitions import (
     PluginSettings,
     ModelProviderDefinition,
     SettingsGrid,
+    ParagraphSetting,
 )
 from lib.PluginBase import PluginBase, PluginManifest
 from lib.Logger import log
