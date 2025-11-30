@@ -92,7 +92,7 @@ class SherpaParakeetPlugin(PluginBase):
     def __init__(self, plugin_manifest: PluginManifest):
         super().__init__(plugin_manifest)
         
-        self.settings = PluginSettings(
+        self.settings_config = PluginSettings(
             key="Parakeet STT",
             label="Parakeet STT",
             icon="mic",
@@ -108,7 +108,7 @@ class SherpaParakeetPlugin(PluginBase):
                             readonly=False,
                             placeholder=None,
                             
-                            content="To use Parakeet STT, select it as your *STT provider* in *Advanced → STT Settings*."
+                            content='To use Parakeet STT, select it as your "STT provider" in "Advanced" → "STT Settings".'
                         ),
                     ]
                 ),
