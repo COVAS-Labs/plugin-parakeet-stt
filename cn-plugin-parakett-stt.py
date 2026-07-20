@@ -120,7 +120,7 @@ class SherpaParakeetPlugin(PluginBase):
             ModelProviderDefinition(
                 kind='stt',
                 id='parakeet-stt',
-                label='Parakeet STT (Offline)',
+                label='Parakeet (Local)',
                 settings_config=[] # No settings needed as model path is hardcoded
             )
         ]
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     # For testing purposes
     plugin_manifest = PluginManifest(
         name="Sherpa Parakeet STT Plugin",
-        version="1.0.0",
+        version="0.0.7",
         author="OpenAI",
         description="Sherpa ONNX Parakeet STT Plugin for COVAS:NEXT"
     )
