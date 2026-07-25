@@ -15,16 +15,20 @@ from lib.PluginSettingDefinitions import (
     ModelProviderDefinition,
     SettingsGrid,
     ParagraphSetting,
+    NumericalSetting,
 )
 from lib.PluginBase import PluginBase, PluginManifest
 from lib.Logger import log
 
+DEFAULT_ONNX_THREADS = max(1, (os.cpu_count() or 1) // 2)
+
 class SherpaParakeetSTTModel(STTModel):
     """Sherpa ONNX Parakeet Speech-to-Text model implementation."""
     
-    def __init__(self, model_dir: str):
+    def __init__(self, model_dir: str, onnx_threads: int = DEFAULT_ONNX_THREADS):
         super().__init__("parakeet-stt")
         self.model_dir = model_dir
+        self.onnx_threads = max(1, int(onnx_threads))
         self._recognizer = None
     
     def _get_recognizer(self) -> Any:
@@ -51,7 +55,7 @@ class SherpaParakeetSTTModel(STTModel):
                     decoder=os.path.join(self.model_dir, decoder),
                     joiner=os.path.join(self.model_dir, joiner),
                     tokens=os.path.join(self.model_dir, tokens),
-                    num_threads=1,
+                    num_threads=self.onnx_threads,
                     model_type="nemo_transducer",
                     debug=False
                 )
@@ -121,7 +125,25 @@ class SherpaParakeetPlugin(PluginBase):
                 kind='stt',
                 id='parakeet-stt',
                 label='Parakeet (Local)',
-                settings_config=[] # No settings needed as model path is hardcoded
+                settings_config=[
+                    SettingsGrid(
+                        key="performance",
+                        label="Performance",
+                        fields=[
+                            NumericalSetting(
+                                key="onnx_threads",
+                                label="CPU Threads",
+                                type="number",
+                                readonly=False,
+                                placeholder=str(DEFAULT_ONNX_THREADS),
+                                default_value=DEFAULT_ONNX_THREADS,
+                                min_value=1,
+                                max_value=max(1, os.cpu_count() or 1),
+                                step=1,
+                            )
+                        ],
+                    )
+                ]
             )
         ]
     
@@ -134,7 +156,8 @@ class SherpaParakeetPlugin(PluginBase):
             plugin_dir = os.path.dirname(os.path.abspath(__file__))
             model_dir = os.path.join(plugin_dir, "model")
             
-            return SherpaParakeetSTTModel(model_dir=model_dir)
+            onnx_threads = int(settings.get("onnx_threads", DEFAULT_ONNX_THREADS))
+            return SherpaParakeetSTTModel(model_dir=model_dir, onnx_threads=onnx_threads)
         
         raise ValueError(f'Unknown Sherpa provider: {provider_id}')
 
@@ -142,7 +165,7 @@ if __name__ == "__main__":
     # For testing purposes
     plugin_manifest = PluginManifest(
         name="Sherpa Parakeet STT Plugin",
-        version="0.0.7",
+        version="0.0.8",
         author="OpenAI",
         description="Sherpa ONNX Parakeet STT Plugin for COVAS:NEXT"
     )
